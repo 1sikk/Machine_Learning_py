@@ -1,11 +1,13 @@
 import sklearn
 import pandas as pd
-
-print(sklearn.__version__)
 from sklearn.datasets import load_iris  # 붓꽃의 데이터를 로드
 from sklearn.tree import DecisionTreeClassifier  # 의사결정나무 임포트
 from sklearn.model_selection import train_test_split  # 트레이닝셋과 테스트셋 스프릿
 from sklearn.metrics import accuracy_score  # 정확도 확인하는 매서드
+from sklearn.model_selection import StratifiedKFold # startifiedKfold 임포트
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 
 iris = load_iris()  # 아이리스 데이터셋 로드
 # iris.data 는 피처만으로 된 데이터를 numpy로 가지고 있음.
@@ -100,20 +102,121 @@ cv_accuracy = []
 print('붓꽃 데이터 세트의 크기 : ', features.shape[0])
 
 # KFold 객체의 split()를 호출하면 폴드 별 학습용, 검증용 테스트의 로우 인덱스를 array로 변환
-n_iter = 0
+counter = 0
 for train_index, test_index, in kfold.split(features):
     X_train, X_test = features[train_index], features[test_index]
     y_train, y_test = label[train_index], label[test_index]
     # 학습,예측하기
     df.fit(X_train,y_train)
     pred = df.predict(X_test)
-    n_iter +=1
+    counter +=1
     # 반복할때마 정확도를 측정함
     accuracy = np.round(accuracy_score(y_test,pred),4)
     train_size = X_train.shape[0]
     test_size = X_test.shape[0]
-    print('\n#{0} 교차 검증 정확도 : {1}' '학습 데이터 크기 : {2}' '검증 데이터 크기 : {3}'.format(n_iter,accuracy,train_size,test_size))
-    print('#{0} 검증 세트 인덱스 : {1}'.format(n_iter,test_index))
+    print('\n#{0} 교차 검증 정확도 : {1}' '학습 데이터 크기 : {2}' '검증 데이터 크기 : {3}'.format(counter,accuracy,train_size,test_size))
+    print('#{0} 검증 세트 인덱스 : {1}'.format(counter,test_index))
     cv_accuracy.append(accuracy)
 
 print('\n## 평균 검증 정확도 : ', np.mean(cv_accuracy))
+
+# startified K폴드 검정
+
+import pandas as pd
+
+iris = load_iris()
+iris_df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+iris_df['label'] = iris.target #라벨이라는 컬럼 생성하여 타켓을 넣어줌
+iris_df['label'].value_counts() # 0,1,2 가 각각 50개 씩 들어간걸 볼수있음
+
+
+## 이렇게만들면 3개로 나눴을때 하나의 조건이 아예 배제되는 현상이 발생한다.
+kfold = KFold(n_splits=3) #3개의 데이터셋으로 분할
+counter = 0
+for train_index,test_index in kfold.split(iris_df):
+    counter +=1
+    label_train = iris_df['label'].iloc[train_index]
+    label_test = iris_df['label'].iloc[test_index]
+    print('교차검증 {0}'.format(counter))
+    print('학습데이터 분포 : \n ', label_train.value_counts())
+    print('검증 레이블 데이터 분포 : \n' , label_test.value_counts())
+
+# 때문에 StartifedKFold 방식으로 데이터를 처리 하여야 한다.
+from sklearn.model_selection import StratifiedKFold # startifiedKfold 임포트
+
+stk = StratifiedKFold(n_splits=3)
+counter = 0
+
+for train_index,test_index in stk.split(iris_df,iris_df['label']):
+    counter += 1
+    label_train = iris_df['label'].iloc[train_index]
+    label_test = iris_df['label'].iloc[test_index]
+    print('## 교차 검증 : {0}'.format(counter))
+    print('학습 레이블 데이터 분포 : \n', label_train.value_counts())
+    print('테스트 레이블 데이터 분포 : \n', label_test.value_counts())
+
+# StartifiedKFold로 분배된 데이터로 의사결정나무 학습하기
+
+stk_dt = DecisionTreeClassifier(random_state=1)
+
+stk = StratifiedKFold(n_splits=3) # StartifedKfold 3분할
+counter = 0  # 3개의 데이터가있으니 3번 반복함
+accuracy_ls = [] #정확도를 담을 list
+
+for train_index,test_index in stk.split(features, label):
+    X_train, X_test = features[train_index], features[test_index]
+    y_train, y_test = label[train_index], label[test_index]
+    stk_dt.fit(X_train,y_train) # 학습용 세트 학습
+    predict = stk_dt.predict(X_test) # 테스트 셋으로 예측
+
+    counter += 1
+    accuracy = np.around(accuracy_score(y_test,predict),4) #소수점 4자리까지 반올림
+    train_size = X_train.shape[0]
+    test_size = X_test.shape[0]
+    print('\n{0} 교차 검증 정확도 :{1} 학습데이터 크기 : {2}' '검증 데이터 크기 : {3}'.format(counter,accuracy,train_size,test_size))
+    print('#{0} 검증 세트 인덱스 :{1}'.format(counter,test_index))
+    accuracy_ls.append(accuracy)
+    print('\n 교차 검증별 정확도 : ', np.around(accuracy_ls,4))
+    print('평균 검증 정확도 : ', np.mean(accuracy_ls))
+
+# 사이킷런에서는 편하게 교차검증을 할수 있는 API를 제공한다.
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score,cross_validate
+from sklearn.datasets import load_iris
+
+iris_data = load_iris()
+dt_iris = DecisionTreeClassifier(random_state=1)
+
+data = iris_data.data
+label = iris_data.target
+# 성능지표를 설정할수있는데 성능 지표는 accuracy로 지정한다.
+score = cross_val_score(dt_iris, data, label, scoring='accuracy', cv=3) # 정확도 를 성능지표로 3분할
+print('교차 검증별 정확도 : ', np.around(score,4))
+print('평균 검증 정확도 : ', np.around(np.mean(score),4))
+
+# GridsearchCV 하이퍼 파라미터를 튜닝해서 최적화된 알고리즘 찾기
+from sklearn.model_selection import  GridSearchCV
+import pandas as pd
+iris_data = load_iris()
+X_train,X_test,y_train,y_test = train_test_split(iris_data.data, iris_data.target, test_size=0.2, random_state=1)
+
+dt_iris = DecisionTreeClassifier()
+
+parameters = {'max_depth':[1,2,3],'min_samples_split':[2,3]}
+
+gird_dtree = GridSearchCV(dt_iris,param_grid=parameters, cv=3, refit=True)
+# 붓꽃 학습 데이터로 param_grid의 하이퍼 파라미터를 순차적으로 학습/평가
+gird_dtree.fit(X_train, y_train)
+# GridSearchCV 결과를 추출해 DatgaFrame으로 변환
+score_df = pd.DataFrame(gird_dtree.cv_results_)
+score_df[['params','mean_test_score','rank_test_score', 'split0_test_score','split1_test_score','split2_test_score']]
+# GridsearchCV를 통해 추출한 결과에서 필요한 자료만 뽑기
+
+print('GridserchCV 최적의 파라미터 : ', gird_dtree.best_params_)
+print('GridserchCV 최고 정확도 : {0:0.4f} '.format(gird_dtree.best_score_))
+
+# 최고 측정치로 학습된 결과는 best_estimator_에 저장이 됨. 이미 최적으로 학습된 상태이므로 학습을 해줄 필요가 없다.
+estimator = gird_dtree.best_estimator_
+predict = estimator.predict(X_test)
+print('테스트 데이터 테스트 정확도 : {0:.4f}'.format(accuracy_score(y_test,predict)))

@@ -142,15 +142,17 @@ print('제일 강한 마블 히어로 순서 : ', name_array[sort_idx_pwr])
 # 선형대수 계산
 
 # 행렬의 곱은 np.dot을 이용하여 구할수있다.
-array1 = np.array([[1,2,3],[4,5,6]])
-array2 = np.array([[7,8],[9,10],[11,12]])
-np_dot = np.dot(array1,array2)
+array1 = np.array([[1,2],[3,4],[5,6]])
+array2 = np.array([[7,8,9],[10,11,12]])
+np_dot = np.dot(array1, array2)
 print('행렬곱 = ', np_dot)
 
 # 전치 행렬
 # 전치 행렬은 행과 열의 위치를 교환한 원소로 구성한 행렬이다.
 
-matrix = np.array([[1,2],
-                   [3,4]])
+matrix = np.array([[1,2],[3,4]])
 trans_mtx = np.transpose(matrix)
 print('1,2,3,4 2*2의 전치행렬은 ', trans_mtx)
+
+random_array = np.random.randn(3, 3)
+data

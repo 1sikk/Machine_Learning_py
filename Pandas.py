@@ -208,6 +208,7 @@ titan_df.groupby('Pclass').agg(agg_format)
 # NA 처리
 # 결손값이 아닌것은 0 결손값인 것은 1로 표현 되기때문에 모두 더하면 결손값의 데이터 개수를 알 수 있다.
 titan_df.isna().sum() # 카운트로하게되면 모든 값을 셈
+titan_df.isna().sum() # 카운트로하게되면 모든 값을 셈
 titan_df['Cabin'] = titan_df['Cabin'].fillna('C000')
 titan_df.head(3) # 결손값이 C000로 채워진걸 볼 수 있다.
 

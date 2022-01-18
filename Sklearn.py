@@ -220,3 +220,4 @@ print('GridserchCV 최고 정확도 : {0:0.4f} '.format(gird_dtree.best_score_))
 estimator = gird_dtree.best_estimator_
 predict = estimator.predict(X_test)
 print('테스트 데이터 테스트 정확도 : {0:.4f}'.format(accuracy_score(y_test,predict)))
+측

@@ -7,7 +7,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.datasets import load_digits
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import  accuracy_score,precision_score,recall_score,confusion_matrix
+from sklearn.metrics import  accuracy_score,precision_score,recall_score
+from sklearn.metrics import confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import precision_recall_curve
 import matplotlib.pyplot as plt

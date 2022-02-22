@@ -179,7 +179,7 @@ get_eval_by_threshold(y_test, pred_proba[:,1].reshape(-1,1),thresholds)
 pred_proba_class1 = log_clf.predict_proba(X_test)[:,1]
 # 실제값 데이터 세트와 레이블 값이 1일 때의 예측확률을 precision_recall_curve의 인자로 입력하기
 precisoions, recalls, thresholds = precision_recall_curve(y_test, pred_proba_class1)
-print('반환된 불류 결정 임곗값 배열의 shape : ', thresholds.shape) # precision_recall_curve는 0.11~ 0.95사이의 데이터값을 담고있는 ndarray로 구성됨
+print('반환된 분류 결정 임곗값 배열의 shape : ', thresholds.shape) # precision_recall_curve는 0.11~ 0.95사이의 데이터값을 담고있는 ndarray로 구성됨
 # 반환된 임계값이 143개나 되기때문에 10개정도만 비교하기로하되 15개의 step을 둠
 thr_index = np.arange(0,thresholds.shape[0],15)
 print('샘플 추출을 위한 임계값 배열의 index 10개 : ', thr_index # 15개의 스탭으로 분류된 인덱스를 볼수 있음.
@@ -209,3 +209,26 @@ def precision_recall_curve_plot(y_test,pred_proba_c1) :
     plt.show()
 
 precision_recall_curve_plot(y_test, log_clf.predict_proba(X_test)[:,1])
+
+## F1 스코어
+# F1 스코어는 정밀도와 재현율을 결합한 지표이다. 정밀도와 재현율이 어느쪽에 치우치지않을때 높은 값을 갖는다.
+
+from sklearn.metrics import f1_score
+f1 = f1_score(y_test, predict)
+print('F1스코어:{0:.4f}'.format(f1))
+
+# 임계치를 조정하면서 F1 지표도 같이보기
+def get_clf_eval_threshold(y_test, pred):
+    confusion = confusion_matrix(y_test, pred)
+    accuracy= accuracy_score(y_test, pred)
+    precision = precision_score(y_test, pred)
+    recall = recall_score(y_test,pred)
+    # f1 스코어도 추가
+    f1 =  f1_score(y_test, pred)
+    print('오차 행렬 값')
+    print(confusion)
+    print('정확도 : {0:.4f}' '정밀도 : {1:.4f}' '재현율 : {2:.4f}' 'F1 score : {3:.4f}'.format(accuracy,precision,recall,f1))
+
+thresholds = [0.4, 0.45, 0.5, 0.55, 0.60]
+pred_proba = log_clf.predict_proba(X_test)
+get_eval_by_threshold(y_test, pred_proba[:,1].reshape(-1,1), thresholds)

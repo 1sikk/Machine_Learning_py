@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt  # 시각화를 위해 필요한 패키지
 import numpy as np  # 넘파이
 import pandas as pd  # 판다스
 import seaborn as sns  # 시각화 패키지
+from sklearn import preprocessing
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier

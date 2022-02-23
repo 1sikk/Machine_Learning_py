@@ -232,3 +232,73 @@ def get_clf_eval_threshold(y_test, pred):
 thresholds = [0.4, 0.45, 0.5, 0.55, 0.60]
 pred_proba = log_clf.predict_proba(X_test)
 get_eval_by_threshold(y_test, pred_proba[:,1].reshape(-1,1), thresholds)
+
+## ROC곡선을 생성하기
+from sklearn.metrics import roc_curve
+
+from sklearn.metrics import roc_curve
+
+# 레이블 값이 1일때의 예측 확률을 추출
+pred_proba_class1 = log_clf.predict_proba(X_test)[:, 1]
+
+fprs , tprs , thresholds = roc_curve(y_test, pred_proba_class1)
+# 반환된 임곗값 배열 로우가 47건이므로 샘플로 10건만 추출하되, 임곗값을 5 Step으로 추출.
+thr_index = np.arange(0, thresholds.shape[0], 5)
+print('샘플 추출을 위한 임곗값 배열의 index 10개:', thr_index)
+print('샘플용 10개의 임곗값: ', np.round(thresholds[thr_index], 2))
+
+# 5 step 단위로 추출된 임계값에 따른 FPR, TPR 값
+print('샘플 임곗값별 FPR: ', np.round(fprs[thr_index], 3))
+print('샘플 임곗값별 TPR: ', np.round(tprs[thr_index], 3))
+
+
+def roc_curve_plot(y_test, pred_proba_c1):
+    # 임곗값에 따른 FPR, TPR 값을 반환 받음.
+    fprs, tprs, thresholds = roc_curve(y_test, pred_proba_c1)
+
+    # ROC Curve를 plot 곡선으로 그림.
+    plt.plot(fprs, tprs, label='ROC')
+    # 가운데 대각선 직선을 그림.
+    plt.plot([0, 1], [0, 1], 'k--', label='Random')
+
+    # FPR X 축의 Scale을 0.1 단위로 변경, X,Y 축명 설정등
+    start, end = plt.xlim()
+    plt.xticks(np.round(np.arange(start, end, 0.1), 2))
+    plt.xlim(0, 1);
+    plt.ylim(0, 1)
+    plt.xlabel('FPR( 1 - Sensitivity )');
+    plt.ylabel('TPR( Recall )')
+    plt.legend()
+    plt.show()
+
+
+roc_curve_plot(y_test, log_clf.predict_proba(X_test)[:, 1])
+
+from sklearn.metrics import roc_auc_score
+
+### 아래는 roc_auc_score()의 인자를 잘못 입력한 것으로, 책에서 수정이 필요한 부분입니다.
+### 책에서는 roc_auc_score(y_test, pred)로 예측 타겟값을 입력하였으나
+### roc_auc_score(y_test, y_score)로 y_score는 predict_proba()로 호출된 예측 확률 ndarray중 Positive 열에 해당하는 ndarray입니다.
+
+#pred = lr_clf.predict(X_test)
+#roc_score = roc_auc_score(y_test, pred)
+
+pred_proba = log_clf.predict_proba(X_test)[:, 1]
+roc_score = roc_auc_score(y_test, pred_proba)
+print('ROC AUC 값: {0:.4f}'.format(roc_score))
+
+
+# 위에서 만든 get_clf_eval에 roc커브 까지 한번에 출력할수있는 사용자 함수.
+def get_clf_eval(y_test, pred=None, pred_proba=None):
+    confusion = confusion_matrix( y_test, pred)
+    accuracy = accuracy_score(y_test , pred)
+    precision = precision_score(y_test , pred)
+    recall = recall_score(y_test , pred)
+    f1 = f1_score(y_test,pred)
+    # ROC-AUC 추가
+    roc_auc = roc_auc_score(y_test, pred_proba)
+    print('오차 행렬')
+    print(confusion)
+    # ROC-AUC print 추가
+    print('정확도: {0:.4f}, 정밀도: {1:.4f}, 재현율: {2:.4f},\
+          F1: {3:.4f}, AUC:{4:.4f}'.format(accuracy, precision, recall, f1, roc_auc)

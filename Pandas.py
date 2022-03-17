@@ -1,7 +1,7 @@
 import os
+import pandas as pd
 os.getcwd()
 os.chdir('/Users/sik/Desktop/CSV')
-import pandas as pd
 
 # 판다스를 이용하여 데이터 프레임 생성 csv 말고 다른 파일도 로딩가능
 # 판다스는 기본적으로 ndarray 의 값을 가지고 있음
@@ -231,7 +231,6 @@ list(squares)
 
 titan_df['Name_len'] = titan_df['Name'].apply(lambda x : len(x))
 titan_df[['Name','Name_len']].head(3) # 이름과 이름의 길이가 같이 출력된 것을 볼 수 있다.
-
 # 나이를 이용하여 15세 미만이면 어린이 그렇지 않으면 어른인 컬럼을 생성하여 보여줌.
 # 보통의경우 if절 뒤에 반환값이 오는데 람다의 경우는 if절 앞에 조건이 오는 것을 볼 수 있음.
 titan_df['Child_Adult'] = titan_df['Age'].apply(lambda x : 'Child' if x <=15 else 'Adult')
@@ -255,5 +254,6 @@ def get_category(age) :
 
     return cat
 # 하나씩 받아서 수행
+
 titan_df['Age_cat'] =  titan_df['Age'].apply(lambda x : get_category(x))
 titan_df[['Age','Age_cat']].head

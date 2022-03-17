@@ -100,6 +100,7 @@ array_f2 = array_2d[[0,1],0:2] #1행과2행의 1열과 2열을 출력
 print('array_2d[[0,1],0:2] = ' , array_f2.tolist())
 
 # 불린 인덱싱 (많이 사용됨)
+array_1d = np.arange(start=1,stop=10)
 array_bo = array_1d[array_1d > 5]
 print('array_1d에서 5보다 큰값 = ', array_bo)
 array_1d > 5

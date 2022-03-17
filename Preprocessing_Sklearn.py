@@ -1,7 +1,7 @@
 # 사이킷런에서 레이블 인코딩은 LableEncodr 클래스로 구현함.
 import sklearn
 from sklearn.preprocessing import LabelEncoder
-
+import graphviz
 cars = ['소나타','람보르기니','아반떼','테슬라','테슬라','그랜져','그랜져']
 
 encoder = LabelEncoder()

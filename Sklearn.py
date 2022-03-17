@@ -208,7 +208,7 @@ parameters = {'max_depth':[1,2,3],'min_samples_split':[2,3]}
 gird_dtree = GridSearchCV(dt_iris,param_grid=parameters, cv=3, refit=True)
 # 붓꽃 학습 데이터로 param_grid의 하이퍼 파라미터를 순차적으로 학습/평가
 gird_dtree.fit(X_train, y_train)
-# GridSearchCV 결과를 추출해 DatgaFrame으로 변환
+# GridSearchCV 결과를 추출해 DataFrame으로 변환
 score_df = pd.DataFrame(gird_dtree.cv_results_)
 score_df[['params','mean_test_score','rank_test_score', 'split0_test_score','split1_test_score','split2_test_score']]
 # GridsearchCV를 통해 추출한 결과에서 필요한 자료만 뽑기
@@ -220,4 +220,3 @@ print('GridserchCV 최고 정확도 : {0:0.4f} '.format(gird_dtree.best_score_))
 estimator = gird_dtree.best_estimator_
 predict = estimator.predict(X_test)
 print('테스트 데이터 테스트 정확도 : {0:.4f}'.format(accuracy_score(y_test,predict)))
-측

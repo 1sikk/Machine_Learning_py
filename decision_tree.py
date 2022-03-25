@@ -83,6 +83,7 @@ def get_human_dataset():
     return X_train, X_test, y_train, y_test
 
 
+
 X_train, X_test, y_train, y_test = get_human_dataset()
 
 print('학습 피처 데이터셋 info()')
